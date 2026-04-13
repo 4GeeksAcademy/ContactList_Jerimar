@@ -1,37 +1,49 @@
-// Import necessary hooks and components from react-router-dom and other libraries.
-import { Link, useParams } from "react-router-dom";  // To use link for navigation and useParams to get URL parameters
-import PropTypes from "prop-types";  // To define prop types for this component
-import rigoImageUrl from "../assets/img/rigo-baby.jpg"  // Import an image asset
-import useGlobalReducer from "../hooks/useGlobalReducer";  // Import a custom hook for accessing the global state
+// pages/Single.jsx
+import React, { useContext, useState } from "react";
+import { Context } from "../hooks/useGlobalReducer";
+import { useLocation, useNavigate } from "react-router-dom";
 
-// Define and export the Single component which displays individual item details.
-export const Single = props => {
-  // Access the global state using the custom hook.
-  const { store } = useGlobalReducer()
+const Single = () => {
+    const { actions } = useContext(Context);
+    const navigate = useNavigate();
+    const location = useLocation();
 
-  // Retrieve the 'theId' URL parameter using useParams hook.
-  const { theId } = useParams()
-  const singleTodo = store.todos.find(todo => todo.id === parseInt(theId));
+    const editing = location.state !== null;
+    const contact = location.state;
 
-  return (
-    <div className="container text-center">
-      {/* Display the title of the todo element dynamically retrieved from the store using theId. */}
-      <h1 className="display-4">Todo: {singleTodo?.title}</h1>
-      <hr className="my-4" />  {/* A horizontal rule for visual separation. */}
+    const [form, setForm] = useState({
+        name: editing ? contact.name : "",
+        phone: editing ? contact.phone : "",
+        email: editing ? contact.email : "",
+        address: editing ? contact.address : ""
+    });
 
-      {/* A Link component acts as an anchor tag but is used for client-side routing to prevent page reloads. */}
-      <Link to="/">
-        <span className="btn btn-primary btn-lg" href="#" role="button">
-          Back home
-        </span>
-      </Link>
-    </div>
-  );
+    const handleChange = (e) =>
+        setForm({ ...form, [e.target.name]: e.target.value });
+
+    const handleSubmit = () => {
+        if (editing) {
+            actions.updateContact(contact.id, form);
+        } else {
+            actions.addContact(form);
+        }
+        navigate("/");
+    };
+
+    return (
+        <div className="container mt-4">
+            <h1>{editing ? "Editar Contacto" : "Añadir Contacto"}</h1>
+
+            <input className="form-control my-2" name="name" placeholder="Nombre" value={form.name} onChange={handleChange} />
+            <input className="form-control my-2" name="phone" placeholder="Teléfono" value={form.phone} onChange={handleChange} />
+            <input className="form-control my-2" name="email" placeholder="Email" value={form.email} onChange={handleChange} />
+            <input className="form-control my-2" name="address" placeholder="Dirección" value={form.address} onChange={handleChange} />
+
+            <button className="btn btn-primary" onClick={handleSubmit}>
+                {editing ? "Actualizar" : "Crear"}
+            </button>
+        </div>
+    );
 };
 
-// Use PropTypes to validate the props passed to this component, ensuring reliable behavior.
-Single.propTypes = {
-  // Although 'match' prop is defined here, it is not used in the component.
-  // Consider removing or using it as needed.
-  match: PropTypes.object
-};
+export default Single;
