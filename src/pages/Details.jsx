@@ -11,7 +11,6 @@ const Details = () => {
 
     const isNew = id === "new";
 
-    // Cargar imagen de Rick and Morty
     const loadCharacterImage = async () => {
         try {
             const resp = await fetch("https://rickandmortyapi.com/api/character/");
@@ -34,7 +33,6 @@ const Details = () => {
     });
 
     useEffect(() => {
-        // Si estamos editando, cargar datos del contacto
         if (!isNew) {
             const existing = contacts.find((c) => c.id === Number(id));
             if (existing) {
@@ -47,7 +45,6 @@ const Details = () => {
             }
         }
 
-        // Cargar imagen SIEMPRE
         loadCharacterImage();
     }, [id]);
 
@@ -67,7 +64,6 @@ const Details = () => {
 
     return (
         <div>
-            {/* Imagen de Rick and Morty */}
             {characterImage && (
                 <div className="text-center mb-4">
                     <img

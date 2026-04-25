@@ -5,10 +5,8 @@ import ContactCard from "../components/ContactCard.jsx";
 const Home = () => {
     const { contacts, loading } = useContacts();
 
-    // Aquí guardamos las imágenes por ID de contacto
     const [images, setImages] = useState({});
 
-    // Cargar imágenes de Rick and Morty
     const loadImages = async () => {
         try {
             const resp = await fetch("https://rickandmortyapi.com/api/character/");
@@ -18,7 +16,6 @@ const Home = () => {
 
             const imgMap = {};
 
-            // Asignar una imagen aleatoria a cada contacto
             contacts.forEach((c) => {
                 const random = data.results[Math.floor(Math.random() * data.results.length)];
                 imgMap[c.id] = random.image;
@@ -30,7 +27,6 @@ const Home = () => {
         }
     };
 
-    // Cuando los contactos cambien, cargamos imágenes
     useEffect(() => {
         if (contacts.length > 0) {
             loadImages();
@@ -52,7 +48,7 @@ const Home = () => {
                     <ContactCard
                         key={c.id}
                         contact={c}
-                        image={images[c.id]} // ← enviamos la imagen
+                        image={images[c.id]}
                     />
                 ))}
         </div>

@@ -14,7 +14,6 @@ const ContactCard = ({ contact, image }) => {
     return (
         <div className="card mb-3 p-3 d-flex flex-row align-items-center gap-3">
 
-            {/* Imagen de Rick and Morty */}
             {image && (
                 <img
                     src={image}
