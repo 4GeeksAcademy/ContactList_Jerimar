@@ -1,12 +1,9 @@
-// src/components/Footer.jsx
 import React from "react";
 
-const Footer = () => {
-    return (
-        <footer className="text-center mt-5">
-            <p>© 2024 Contact App</p>
-        </footer>
-    );
-};
+const Footer = () => (
+    <footer className="text-center mt-4 mb-3 text-muted">
+        <small>© 2024 Contact List Jerimar</small>
+    </footer>
+);
 
 export default Footer;

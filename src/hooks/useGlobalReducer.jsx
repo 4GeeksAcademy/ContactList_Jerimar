@@ -1,36 +1,101 @@
-// hooks/useGlobalReducer.jsx
-import React, { createContext, useState, useEffect } from "react";
-import getState from "../store.js";
+import { createContext, useContext, useEffect, useState } from "react";
 
-export const Context = createContext(null);
+const API = "https://playground.4geeks.com/contact";
+const AGENDA = "jerimar_agenda";
 
-const useGlobalReducer = (PassedComponent) => {
-    const StoreWrapper = (props) => {
-        const [state, setState] = useState(
-            getState({
-                getStore: () => state.store,
-                getActions: () => state.actions,
-                setStore: (updatedStore) =>
-                    setState({
-                        store: Object.assign(state.store, updatedStore),
-                        actions: { ...state.actions }
-                    })
-            })
-        );
+const ContactContext = createContext();
+export const useContacts = () => useContext(ContactContext);
 
-        useEffect(() => {
-            state.actions.createAgenda();
-            state.actions.getContacts();
-        }, []);
+export const ContactProvider = ({ children }) => {
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-        return (
-            <Context.Provider value={state}>
-                <PassedComponent {...props} />
-            </Context.Provider>
-        );
+  // Crear agenda si no existe
+  const ensureAgenda = async () => {
+    try {
+      const resp = await fetch(`${API}/agendas/${AGENDA}`, { method: "POST" });
+
+      // 400 = ya existe → NO es error
+      if (resp.status === 400) return;
+    } catch (err) {
+      console.error("Error creando agenda:", err);
+    }
+  };
+
+  // Leer contactos
+  const loadContacts = async () => {
+    setLoading(true);
+    try {
+      const resp = await fetch(`${API}/agendas/${AGENDA}/contacts`);
+
+      if (!resp.ok) {
+        setContacts([]);
+        return;
+      }
+
+      const data = await resp.json();
+
+      // Validar que sea un array
+      if (Array.isArray(data)) {
+        setContacts(data);
+      } else {
+        setContacts([]);
+      }
+    } catch (err) {
+      console.error("Error cargando contactos:", err);
+      setContacts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Crear contacto
+  const createContact = async (contact) => {
+    await fetch(`${API}/agendas/${AGENDA}/contacts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(contact),
+    });
+    loadContacts();
+  };
+
+  // Editar contacto
+  const updateContact = async (id, contact) => {
+    await fetch(`${API}/agendas/${AGENDA}/contacts/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(contact),
+    });
+    loadContacts();
+  };
+
+  // Eliminar contacto
+  const deleteContact = async (id) => {
+    await fetch(`${API}/agendas/${AGENDA}/contacts/${id}`, {
+      method: "DELETE",
+    });
+    loadContacts();
+  };
+
+  useEffect(() => {
+    const init = async () => {
+      await ensureAgenda();
+      await loadContacts();
     };
+    init();
+  }, []);
 
-    return StoreWrapper;
+  return (
+    <ContactContext.Provider
+      value={{
+        contacts,
+        loading,
+        createContact,
+        updateContact,
+        deleteContact,
+      }}
+    >
+      {children}
+    </ContactContext.Provider>
+  );
 };
-
-export default useGlobalReducer;

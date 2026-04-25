@@ -1,9 +1,17 @@
-// main.jsx
 import React from "react";
 import ReactDOM from "react-dom/client";
-import AppRoutes from "./routes.jsx";
-import useGlobalReducer from "./hooks/useGlobalReducer.jsx";
+import { RouterProvider } from "react-router-dom";
 
-const AppWithContext = useGlobalReducer(AppRoutes);
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap";
 
-ReactDOM.createRoot(document.getElementById("root")).render(<AppWithContext />);
+import { router } from "./routes";
+import { ContactProvider } from "./context/ContactContext.jsx";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+    <React.StrictMode>
+        <ContactProvider>
+            <RouterProvider router={router} />
+        </ContactProvider>
+    </React.StrictMode>
+);
