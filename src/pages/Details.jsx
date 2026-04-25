@@ -2,13 +2,29 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useContacts } from "../context/ContactContext.jsx";
 
-
 const Details = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { contacts, createContact, updateContact } = useContacts();
 
+    const [characterImage, setCharacterImage] = useState(null);
+
     const isNew = id === "new";
+
+    // Cargar imagen de Rick and Morty
+    const loadCharacterImage = async () => {
+        try {
+            const resp = await fetch("https://rickandmortyapi.com/api/character/");
+            const data = await resp.json();
+
+            if (data.results && data.results.length > 0) {
+                const random = data.results[Math.floor(Math.random() * data.results.length)];
+                setCharacterImage(random.image);
+            }
+        } catch (error) {
+            console.error("Error cargando imagen de Rick and Morty:", error);
+        }
+    };
 
     const [form, setForm] = useState({
         name: "",
@@ -18,18 +34,22 @@ const Details = () => {
     });
 
     useEffect(() => {
+        // Si estamos editando, cargar datos del contacto
         if (!isNew) {
             const existing = contacts.find((c) => c.id === Number(id));
             if (existing) {
                 setForm({
-                    name: existing.name || "",
-                    email: existing.email || "",
-                    phone: existing.phone || "",
-                    address: existing.address || "",
+                    name: existing.name,
+                    email: existing.email,
+                    phone: existing.phone,
+                    address: existing.address,
                 });
             }
         }
-    }, [id, isNew, contacts]);
+
+        // Cargar imagen SIEMPRE
+        loadCharacterImage();
+    }, [id]);
 
     const handleChange = (e) => {
         setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -47,9 +67,22 @@ const Details = () => {
 
     return (
         <div>
+            {/* Imagen de Rick and Morty */}
+            {characterImage && (
+                <div className="text-center mb-4">
+                    <img
+                        src={characterImage}
+                        alt="Personaje de Rick and Morty"
+                        className="img-fluid rounded"
+                        style={{ maxWidth: "200px" }}
+                    />
+                </div>
+            )}
+
             <h2 className="mb-3">
                 {isNew ? "Agregar contacto" : "Editar contacto"}
             </h2>
+
             <form onSubmit={handleSubmit} className="row g-3">
                 <div className="col-12">
                     <label className="form-label">Nombre</label>
@@ -61,6 +94,7 @@ const Details = () => {
                         required
                     />
                 </div>
+
                 <div className="col-md-6">
                     <label className="form-label">Email</label>
                     <input
@@ -72,6 +106,7 @@ const Details = () => {
                         required
                     />
                 </div>
+
                 <div className="col-md-6">
                     <label className="form-label">Teléfono</label>
                     <input
@@ -82,6 +117,7 @@ const Details = () => {
                         required
                     />
                 </div>
+
                 <div className="col-12">
                     <label className="form-label">Dirección</label>
                     <input
@@ -91,6 +127,7 @@ const Details = () => {
                         onChange={handleChange}
                     />
                 </div>
+
                 <div className="col-12 d-flex gap-2">
                     <button type="submit" className="btn btn-primary">
                         Guardar

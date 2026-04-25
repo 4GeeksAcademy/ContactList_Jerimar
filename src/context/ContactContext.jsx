@@ -1,8 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-const API_BASE = "https://playground.4geeks.com/contact/agendas/";
-const AGENDA_SLUG = "jerimar_agenda";
-
 const ContactContext = createContext();
 
 export const useContacts = () => useContext(ContactContext);
