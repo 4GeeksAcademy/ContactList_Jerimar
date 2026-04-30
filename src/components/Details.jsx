@@ -19,88 +19,50 @@ const Details = () => {
     useEffect(() => {
         if (!isNew) {
             const existing = contacts.find((c) => c.id === Number(id));
-            if (existing) {
-                setForm({
-                    name: existing.name || "",
-                    email: existing.email || "",
-                    phone: existing.phone || "",
-                    address: existing.address || "",
-                });
-            }
+            if (existing) setForm(existing);
         }
     }, [id, isNew, contacts]);
 
     const handleChange = (e) => {
-        setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+        setForm({ ...form, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (isNew) {
-            await createContact(form);
-        } else {
-            await updateContact(Number(id), form);
-        }
+        if (isNew) await createContact(form);
+        else await updateContact(Number(id), form);
+
         navigate("/");
     };
 
     return (
-        <div>
-            <h2 className="mb-3">
-                {isNew ? "Agregar contacto" : "Editar contacto"}
-            </h2>
-            <form onSubmit={handleSubmit} className="row g-3">
+        <div className="container mt-4">
+            <h2>{isNew ? "Agregar contacto" : "Editar contacto"}</h2>
+
+            <form onSubmit={handleSubmit} className="row g-3 mt-3">
                 <div className="col-12">
                     <label className="form-label">Nombre</label>
-                    <input
-                        className="form-control"
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        required
-                    />
+                    <input className="form-control" name="name" value={form.name} onChange={handleChange} required />
                 </div>
+
                 <div className="col-md-6">
                     <label className="form-label">Email</label>
-                    <input
-                        className="form-control"
-                        type="email"
-                        name="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        required
-                    />
+                    <input className="form-control" type="email" name="email" value={form.email} onChange={handleChange} required />
                 </div>
+
                 <div className="col-md-6">
                     <label className="form-label">Teléfono</label>
-                    <input
-                        className="form-control"
-                        name="phone"
-                        value={form.phone}
-                        onChange={handleChange}
-                        required
-                    />
+                    <input className="form-control" name="phone" value={form.phone} onChange={handleChange} required />
                 </div>
+
                 <div className="col-12">
                     <label className="form-label">Dirección</label>
-                    <input
-                        className="form-control"
-                        name="address"
-                        value={form.address}
-                        onChange={handleChange}
-                    />
+                    <input className="form-control" name="address" value={form.address} onChange={handleChange} />
                 </div>
+
                 <div className="col-12 d-flex gap-2">
-                    <button type="submit" className="btn btn-primary">
-                        Guardar
-                    </button>
-                    <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={() => navigate("/")}
-                    >
-                        Cancelar
-                    </button>
+                    <button className="btn btn-primary" type="submit">Guardar</button>
+                    <button className="btn btn-secondary" type="button" onClick={() => navigate("/")}>Cancelar</button>
                 </div>
             </form>
         </div>
